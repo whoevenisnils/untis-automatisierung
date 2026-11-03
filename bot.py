@@ -2,46 +2,49 @@ import os
 import requests
 import webuntis
 
-# Daten sicher aus den GitHub Secrets laden
 USER = os.environ.get("UNTIS_USER")
 PASSWORD = os.environ.get("UNTIS_PASSWORD")
 WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK")
 
-# Server & Schulname deiner Schule (hier anpassen!)
-UNTIS_SERVER = "gaensewinkel.webuntis.com"   # Z. B. mese.webuntis.com, ente.webuntis.com etc.
-UNTIS_SCHOOL = "Gesamtschule_Gänsewinkel_Schwerte"    # Der exakte Name deiner Schule bei WebUntis
+# Deine Schuldaten
+UNTIS_SERVER = "mese.webuntis.com"
+UNTIS_SCHOOL = "Name_deiner_Schule"  # Hier exakten Schulnamen eintragen
 
 def check_untis():
     if not USER or not PASSWORD or not WEBHOOK_URL:
-        print("[-] Fehler: Secrets (UNTIS_USER, UNTIS_PASSWORD, DISCORD_WEBHOOK) fehlen.")
+        print("[-] Fehler: Secrets fehlen.")
         return
 
+    s = None
     try:
-        # Verbindung zu WebUntis herstellen
+        # Session mit stabilen Parametern initialisieren
         s = webuntis.Session(
             server=UNTIS_SERVER,
             username=USER,
             password=PASSWORD,
             school=UNTIS_SCHOOL,
-            useragent="UntisDiscordBot"
+            useragent="UntisDiscordBot_v2"
         )
+        
+        # Einloggen
         s.login()
         
-        # Testnachricht an Discord senden
-        nachricht = "🔔 **Untis-Bot (Cloud):** Verbindung erfolgreich! Der Bot überwacht den Stundenplan."
+        # Test, ob der Stundenplan abgerufen werden kann
+        timetable = s.get_timetable()
         
-        response = requests.post(WEBHOOK_URL, json={"content": nachricht})
-        if response.status_code in (200, 204):
-            print("[+] Discord-Benachrichtigung erfolgreich gesendet!")
-        else:
-            print(f"[-] Fehler beim Senden an Discord: {response.status_code}")
+        nachricht = "🔔 **Untis-Bot (Cloud):** Verbindung und Stundenplan-Abruf erfolgreich!"
+        requests.post(WEBHOOK_URL, json={"content": nachricht})
         
-        s.logout()
     except Exception as e:
         error_msg = f"⚠️ **Untis-Bot Fehler:** {e}"
         print(error_msg)
         requests.post(WEBHOOK_URL, json={"content": error_msg})
+    finally:
+        if s:
+            try:
+                s.logout()
+            except:
+                pass
 
 if __name__ == "__main__":
     check_untis()
-
