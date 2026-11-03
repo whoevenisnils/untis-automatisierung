@@ -9,7 +9,7 @@ WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK")
 
 # Server & Schulname deiner Schule (hier anpassen!)
 UNTIS_SERVER = "gaensewinkel.webuntis.com"   # Z. B. mese.webuntis.com, ente.webuntis.com etc.
-UNTIS_SCHOOL = "Gesamtschule_Gaensewinkel_Schwerte"    # Der exakte Name deiner Schule bei WebUntis
+UNTIS_SCHOOL = "Gesamtschule_Gänsewinkel_Schwerte"    # Der exakte Name deiner Schule bei WebUntis
 
 def check_untis():
     if not USER or not PASSWORD or not WEBHOOK_URL:
