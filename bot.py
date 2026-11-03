@@ -8,7 +8,7 @@ WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK")
 
 # Deine Schuldaten
 UNTIS_SERVER = "gaensewinkel.webuntis.com"
-UNTIS_SCHOOL = "Staedtische Gesamtschule Gaensewinkel"  # Hier exakten Schulnamen eintragen
+UNTIS_SCHOOL = "Städtische Gesamtschule Gänsewinkel"  # Hier exakten Schulnamen eintragen
 
 def check_untis():
     if not USER or not PASSWORD or not WEBHOOK_URL:
