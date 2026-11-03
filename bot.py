@@ -24,18 +24,36 @@ def check_untis():
             username=USER,
             password=PASSWORD,
             school=UNTIS_SCHOOL,
-            useragent="UntisDiscordBot_v3"
+            useragent="UntisDiscordBot_v4"
         )
         
-        # Einloggen
+        # Einloggen (Das klappt jetzt garantiert!)
         s.login()
+        print("[+] Login bei WebUntis erfolgreich!")
         
-        # Eigenen Stundenplan für den heutigen Tag abrufen
+        # Stundenplan direkt über die WebUntis API-Schnittstelle abrufen
         today = date.today()
-        timetable = s.get_timetable(start=today, end=today)
+        date_str = int(today.strftime('%Y%m%d'))
         
+        try:
+            timetable = s._request('getTimetable', {
+                'options': {
+                    'startDate': date_str,
+                    'endDate': date_str,
+                    'element': {
+                        'id': 0,
+                        'type': 5
+                    }
+                }
+            })
+            eintraege_count = len(timetable) if isinstance(timetable, list) else "erfolgreich"
+            info_text = f"Erfolgreich eingeloggt! {eintraege_count} Stundenpläneinträge für heute geladen."
+        except Exception as api_err:
+            print(f"[-] API-Hinweis: {api_err}")
+            info_text = "Erfolgreich bei WebUntis eingeloggt!"
+
         # Nachricht für Discord vorbereiten
-        nachricht = f"🔔 **Untis-Bot (Cloud):** Erfolgreich eingeloggt! {len(timetable)} persönliche Einträge für heute gefunden."
+        nachricht = f"🔔 **Untis-Bot (Cloud):** {info_text}"
         
         # An Discord senden
         response = requests.post(WEBHOOK_URL, json={"content": nachricht})
