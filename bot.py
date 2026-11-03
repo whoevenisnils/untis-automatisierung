@@ -1,6 +1,7 @@
 import os
 import requests
 import webuntis
+from datetime import date
 
 USER = os.environ.get("UNTIS_USER")
 PASSWORD = os.environ.get("UNTIS_PASSWORD")
@@ -8,7 +9,7 @@ WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK")
 
 # Deine Schuldaten
 UNTIS_SERVER = "gaensewinkel.webuntis.com"
-UNTIS_SCHOOL = "gaensewinkel"  # Hier exakten Schulnamen eintragen
+UNTIS_SCHOOL = "gaensewinkel"  # Hier den exakten Schulnamen eintragen
 
 def check_untis():
     if not USER or not PASSWORD or not WEBHOOK_URL:
@@ -17,7 +18,7 @@ def check_untis():
 
     s = None
     try:
-        # Session mit stabilen Parametern initialisieren
+        # Session initialisieren
         s = webuntis.Session(
             server=UNTIS_SERVER,
             username=USER,
@@ -29,10 +30,11 @@ def check_untis():
         # Einloggen
         s.login()
         
-        # Test, ob der Stundenplan abgerufen werden kann
-        timetable = s.get_timetable()
+        # Den aktuellen Stundenplan für heute abrufen (korrekte webuntis-Syntax)
+        today = date.today()
+        timetable = s.get_timetable(start=today, end=today)
         
-        nachricht = "🔔 **Untis-Bot (Cloud):** Verbindung und Stundenplan-Abruf erfolgreich!"
+        nachricht = f"🔔 **Untis-Bot (Cloud):** Erfolgreich eingeloggt! {len(timetable)} Einträge für heute gefunden."
         requests.post(WEBHOOK_URL, json={"content": nachricht})
         
     except Exception as e:
