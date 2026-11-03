@@ -30,27 +30,12 @@ def check_untis():
         # Einloggen
         s.login()
         
-        # Sicherer Abruf des Stundenplans über die integrierte Webservice-Schnittstelle
+        # Eigenen Stundenplan für den heutigen Tag abrufen
         today = date.today()
-        
-        # Fallback-Methode für verschiedene webuntis-Bibliotheksversionen
-        try:
-            timetable = s.get_timetable(start=today, end=today)
-        except AttributeError:
-            # Falls get_timetable in dieser Version anders heißt oder direkt über den Dienst läuft
-            timetable = s._request('getTimetable', {
-                'options': {
-                    'startDate': int(today.strftime('%Y%m%d')),
-                    'endDate': int(today.strftime('%Y%m%d')),
-                    'element': {
-                        'id': s.user_id,
-                        'type': 5 # Typ 5 steht für Schüler
-                    }
-                }
-            })
+        timetable = s.get_timetable(start=today, end=today)
         
         # Nachricht für Discord vorbereiten
-        nachricht = f"🔔 **Untis-Bot (Cloud):** Erfolgreich eingeloggt! Der Stundenplan für heute wurde abgerufen."
+        nachricht = f"🔔 **Untis-Bot (Cloud):** Erfolgreich eingeloggt! {len(timetable)} persönliche Einträge für heute gefunden."
         
         # An Discord senden
         response = requests.post(WEBHOOK_URL, json={"content": nachricht})
