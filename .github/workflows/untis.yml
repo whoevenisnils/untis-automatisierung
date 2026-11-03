@@ -1,0 +1,30 @@
+name: Untis Check
+
+on:
+  schedule:
+    - cron: '*/15 * * * *' # Läuft automatisch alle 15 Minuten
+  workflow_dispatch: # Ermöglicht auch einen manuellen Start über die GitHub-Website
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: Python einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Abhängigkeiten installieren
+        run: |
+          pip install webuntis requests
+
+      - name: Bot ausführen
+        env:
+          UNTIS_USER: ${{ secrets.UNTIS_USER }}
+          UNTIS_PASSWORD: ${{ secrets.UNTIS_PASSWORD }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          python bot.py
