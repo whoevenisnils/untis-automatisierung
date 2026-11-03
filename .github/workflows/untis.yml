@@ -2,8 +2,8 @@ name: Untis Check
 
 on:
   schedule:
-    - cron: '*/15 * * * *' # Läuft automatisch alle 15 Minuten
-  workflow_dispatch: # Ermöglicht auch einen manuellen Start über die GitHub-Website
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
 
 jobs:
   run-bot:
@@ -17,9 +17,9 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Abhängigkeiten installieren
+      - name: Abhängigkeiten aktualisieren
         run: |
-          pip install webuntis requests
+          pip install --upgrade webuntis requests
 
       - name: Bot ausführen
         env:
