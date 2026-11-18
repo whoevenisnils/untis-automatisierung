@@ -2,8 +2,11 @@ name: Untis Check
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '*/15 * * * *' # Läuft alle 15 Minuten
   workflow_dispatch:
+
+permissions:
+  contents: write # Wichtig, damit der Bot die Datei speichern darf
 
 jobs:
   run-bot:
@@ -17,9 +20,9 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Abhängigkeiten aktualisieren
+      - name: Abhängigkeiten installieren
         run: |
-          pip install --upgrade webuntis requests
+          pip install webuntis requests
 
       - name: Bot ausführen
         env:
@@ -28,3 +31,10 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
           python bot.py
+
+      - name: Stundenplan-Zustand speichern
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add last_timetable.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update last timetable state" && git push)
